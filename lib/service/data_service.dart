@@ -31,9 +31,9 @@ class MediaLibrary {
     MediaItem(
       id: "https://firebasestorage.googleapis.com/v0/b/techtibetmusic.appspot.com/o/1579422409491__y2mate.com%20-%20tibetan_new_song_phur_2017_anu_xRGTQaCbbnw.mp3?alt=media&token=23d936b4-4a99-4e5b-89f9-8edfb1944600",
       album: "Science Friday",
-      title: "Test 2",
-      artist: "Science Friday and WNYC Studios",
-      duration: Duration(milliseconds: 2856950),
+      title: "Phur-Tibetan Song",
+      artist: "Anu ",
+      duration: Duration(milliseconds: 273000),
       artUri:
       "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
     )

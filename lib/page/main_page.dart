@@ -120,44 +120,7 @@ class _StackBuilderState extends State<StackBuilder>
               (queue, mediaItem, playbackState) =>
               ScreenState(queue, mediaItem, playbackState));
 
-  RaisedButton audioPlayerButton() => startButton(
-    'Audio Player',
-        () {
-      AudioService.start(
-        backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
-        androidNotificationChannelName: 'Audio Service Demo',
-        // Enable this if you want the Android service to exit the foreground state on pause.
-        //androidStopForegroundOnPause: true,
-        androidNotificationColor: 0xFF2196f3,
-        androidNotificationIcon: 'mipmap/ic_launcher',
-        androidEnableQueue: true,
-      );
-    },
-  );
 
-  RaisedButton startButton(String label, VoidCallback onPressed) =>
-      RaisedButton(
-        child: Text(label),
-        onPressed: onPressed,
-      );
-
-  IconButton playButton() => IconButton(
-    icon: Icon(Icons.play_arrow),
-    iconSize: 64.0,
-    onPressed: AudioService.play,
-  );
-
-  IconButton pauseButton() => IconButton(
-    icon: Icon(Icons.pause),
-    iconSize: 64.0,
-    onPressed: AudioService.pause,
-  );
-
-  IconButton stopButton() => IconButton(
-    icon: Icon(Icons.stop),
-    iconSize: 64.0,
-    onPressed: AudioService.stop,
-  );
 
   Widget positionIndicator(MediaItem mediaItem, PlaybackState state) {
     double seekPos;
@@ -192,7 +155,16 @@ class _StackBuilderState extends State<StackBuilder>
                   _dragPositionSubject.add(null);
                 },
               ),
-            Text("${state.currentPosition}"),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("${getCurrentTime(state.currentPosition.inSeconds)}"),
+                  Text("${getCurrentTime(mediaItem?.duration?.inSeconds)}")
+                ],
+              ),
+            ),
           ],
         );
       },
@@ -239,15 +211,16 @@ class _StackBuilderState extends State<StackBuilder>
     isAnimCompleted = !isAnimCompleted;
   }
 
-  playSong() {
-    if (isSongPlaying) {
+  playSong(bool playing) {
+
+    if (playing) {
       playPauseController.reverse();
       songCompletedController.reverse();
-      AudioService.play;
+      AudioService.pause();
     } else {
       playPauseController.forward();
       songCompletedController.forward();
-      AudioService.pause;
+      AudioService.play();
     }
     isSongPlaying = !isSongPlaying;
   }
@@ -315,18 +288,19 @@ class _StackBuilderState extends State<StackBuilder>
                       ),
                     ),
                     Text(
-                      mediaItem?.title != null?mediaItem.title:'Loading.....',
+                      mediaItem?.title != null?mediaItem.title:'Loading title.....',
                       style: prefix0.TextStyle(
                           color: songsContianerTextColorAnimation.value,
                           fontSize: 16.0),
                     ),
                     Text(
-                      mediaItem?.artist!=null?mediaItem.artist:'Loading.....',
+                      mediaItem?.artist!=null?mediaItem.artist:'Loading artist.....',
                       style: prefix0.TextStyle(
                           color: songsContianerTextColorAnimation.value,
                           fontSize: 12.0),
                     ),
-                    Padding(
+                    positionIndicator(mediaItem, state),
+                   /* Padding(
                       padding: const EdgeInsets.only(top: 18.0),
                       child: GestureDetector(
                         onHorizontalDragStart: (details) {
@@ -356,7 +330,7 @@ class _StackBuilderState extends State<StackBuilder>
                           ),
                         ),
                       ),
-                    ),
+                    ),*/
                     if (queue != null && queue.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -376,7 +350,7 @@ class _StackBuilderState extends State<StackBuilder>
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                playSong();
+                                playSong(playing);
                               },
                               child: AnimatedIcon(
                                 icon: AnimatedIcons.play_pause,
@@ -445,6 +419,16 @@ class _StackBuilderState extends State<StackBuilder>
         );
       },
     );
+
+  }
+
+  getCurrentTime(int inSeconds) {
+    if(inSeconds!=null){
+      var d = Duration(seconds:inSeconds);
+      List<String> parts = d.toString().split(':');
+      print(parts[0]);
+      return '${parts[1].padLeft(2, '0')}:${parts[2].padLeft(2, '0').split('.')[0]}';
+    }
 
   }
 }
